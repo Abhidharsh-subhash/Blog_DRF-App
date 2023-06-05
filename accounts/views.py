@@ -18,6 +18,5 @@ class SignUpView(GenericAPIView):
                 'data':serializer.data
             }
             return Response(data=response,status=status.HTTP_201_CREATED)
-        errors = serializer.errors  # Get the validation errors as a dictionary
-        return Response(data=errors,status=status.HTTP_400_BAD_REQUEST)
+        return Response(data=serializer.errors,status=status.HTTP_400_BAD_REQUEST)
 

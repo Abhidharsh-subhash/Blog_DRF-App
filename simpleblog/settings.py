@@ -58,6 +58,11 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = 'simpleblog.urls'
 
+#it is used becaue when we test the api's we are getting an error and shows that as "non-field-errors"
+REST_FRAMEWORK = {
+    "NON_FIELD_ERRORS_KEY":"errors"
+}
+
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',

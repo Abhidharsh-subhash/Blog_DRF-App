@@ -15,3 +15,11 @@ class SignUpSerializer(serializers.ModelSerializer):
         if email_exists:
             raise ValidationError('Email has already been used')
         return super().validate(attrs)
+    #custom create method to hash the passwords of the users
+    def create(self, validated_data):
+        password=validated_data.pop('password')
+        user=super().create(validated_data)
+        user.set_password(password)
+        user.save()
+        return user
+    
