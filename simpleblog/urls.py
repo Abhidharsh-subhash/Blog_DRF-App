@@ -16,16 +16,17 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path,include
 #When dealing with viewsets and routers
-from posts.views import PostViewset
+# from posts.views import PostViewset
 from rest_framework.routers import DefaultRouter
 
-router=DefaultRouter()
-router.register("",PostViewset,basename='posts')
+#this is used when we use api developed with router and viewsets
+# router=DefaultRouter()
+# router.register("",PostViewset,basename='posts')
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     #avoid this when we are using routers
-    # path("posts/",include("posts.urls")),
-    path('posts/',include(router.urls)),
+    path("posts/",include("posts.urls")),
+    # path('posts/',include(router.urls)),
     path('accounts/',include('accounts.urls')),
 ]

@@ -24,7 +24,6 @@ class SignUpView(GenericAPIView):
         return Response(data=serializer.errors,status=status.HTTP_400_BAD_REQUEST)
 
 class LoginView(APIView):
-    permission_classes = []
     def post(self,request:Request):
         email=request.data.get('email')
         password=request.data.get('password')
@@ -32,7 +31,7 @@ class LoginView(APIView):
         if user is not None:
             response={
                 'message':'Login successfull',
-                'token':user.token.key
+                'token':user.auth_token.key
             }
             return Response(data=response,status=status.HTTP_200_OK)
         else:
