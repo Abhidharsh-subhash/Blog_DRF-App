@@ -7,6 +7,7 @@ from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.request import Request
 from rest_framework.views import APIView
+from .tokens import create_jwt_paie_for_user
 # Create your views here.
 
 class SignUpView(GenericAPIView):
@@ -29,9 +30,10 @@ class LoginView(APIView):
         password=request.data.get('password')
         user=authenticate(email=email,password=password)
         if user is not None:
+            tokens=create_jwt_paie_for_user(user)
             response={
                 'message':'Login successfull',
-                'token':user.auth_token.key
+                'token':tokens
             }
             return Response(data=response,status=status.HTTP_200_OK)
         else:
