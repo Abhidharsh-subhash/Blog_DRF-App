@@ -46,39 +46,43 @@ def homepage(request:Request):
 #     return Response(data=response,status=status.HTTP_200_OK)
 
 #Creating class based views with APIView
-class PostListCreateView(APIView):
-    """
-    a view for creating and listing posts
-    """
-    #it allow us to convert our object to json as well as be able to create post request with some validations
-    serializer_class=PostSerializer
-    permission_classes=[IsAuthenticatedOrReadOnly]
-    def get(self,request:Request,*args,**kwargs):
-        posts=Post.objects.all()
-        #creating an instance of our serializer that going to help us serilize the posts
-        serializer=self.serializer_class(instance=posts,many=True)
-        return Response(data=serializer.data,status=status.HTTP_200_OK)
-    def post(self,request:Request,*args,**kwargs):
-        data=request.data
-        serializer=self.serializer_class(data=data)
-        if serializer.is_valid():
-            serializer.save()
-            response={
-                'message':'Post created',
-                'data':serializer.data
-            }
-            return Response(data=response,status=status.HTTP_201_CREATED)
-        return Response(data=serializer.errors,status=status.HTTP_400_BAD_REQUEST)
+# class PostListCreateView(APIView):
+#     """
+#     a view for creating and listing posts
+#     """
+#     #it allow us to convert our object to json as well as be able to create post request with some validations
+#     serializer_class=PostSerializer
+#     permission_classes=[IsAuthenticatedOrReadOnly]
+#     def get(self,request:Request,*args,**kwargs):
+#         posts=Post.objects.all()
+#         #creating an instance of our serializer that going to help us serilize the posts
+#         serializer=self.serializer_class(instance=posts,many=True)
+#         return Response(data=serializer.data,status=status.HTTP_200_OK)
+#     def post(self,request:Request,*args,**kwargs):
+#         data=request.data
+#         serializer=self.serializer_class(data=data)
+#         if serializer.is_valid():
+#             serializer.save()
+#             response={
+#                 'message':'Post created',
+#                 'data':serializer.data
+#             }
+#             return Response(data=response,status=status.HTTP_201_CREATED)
+#         return Response(data=serializer.errors,status=status.HTTP_400_BAD_REQUEST)
 
 #Creating views using GenericAPIView with mixins
-# class PostListCreateView(GenericAPIView,mixins.ListModelMixin,mixins.CreateModelMixin):
-#     serializer_class=PostSerializer
-#     permission_classes=[IsAuthenticated]
-#     queryset=Post.objects.all()
-#     def get(self,request:Request,*args,**kwargs):
-#         return self.list(request,*args,**kwargs)
-#     def post(self,request:Request,*args,**kwargs):
-#         return self.create(request,*args,**kwargs)
+class PostListCreateView(GenericAPIView,mixins.ListModelMixin,mixins.CreateModelMixin):
+    serializer_class=PostSerializer
+    permission_classes=[IsAuthenticated]
+    queryset=Post.objects.all()
+    def perform_create(self, serializer):
+        user=self.request.user
+        serializer.save(author=user)
+        return super().perform_create(serializer)
+    def get(self,request:Request,*args,**kwargs):
+        return self.list(request,*args,**kwargs)
+    def post(self,request:Request,*args,**kwargs):
+        return self.create(request,*args,**kwargs)
 
 # @api_view(http_method_names=['GET'])
 # def post_detial(request:Request,post_id:int):
@@ -170,3 +174,23 @@ class PostRetrieveUpdateDeleteView(GenericAPIView,mixins.RetrieveModelMixin,mixi
 # class PostViewset(viewsets.ModelViewSet):
 #     queryset=Post.objects.all()
 #     serializer_class=PostSerializer
+
+class ListPostsForAuthor(GenericAPIView,mixins.ListModelMixin):
+    queryset=Post.objects.all()
+    serializer_class=PostSerializer
+    permission_classes=[IsAuthenticated]
+    def get_queryset(self):
+
+        # this is used when we fetch the posts in accordance with the user
+        # user=self.request.user
+        # this is used when we directly give the username with the request
+        # username=self.kwargs.get('username')
+        username=self.request.query_params.get('username') or None
+        queryset=Post.objects.all()
+        if username is not None:
+            #it is we are using author__ is know as lookup
+            return Post.objects.filter(author__username=username)
+        return queryset
+
+    def get(self,request,*args,**kwargs):
+        return self.list(request,*args,**kwargs)
