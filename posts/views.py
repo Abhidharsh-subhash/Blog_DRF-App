@@ -7,9 +7,16 @@ from rest_framework.generics import GenericAPIView
 from .models import Post
 from .serializers import PostSerializer
 from .permissions import ReadOnly,AuthorOrReadonly
+from rest_framework.pagination import PageNumberPagination
 from django.shortcuts import get_object_or_404
 #when dealing with viewsets
 from rest_framework import viewsets
+
+#custom class for defining the pagination class
+class CustomPaginator(PageNumberPagination):
+    page_size=4
+    page_query_param='page'
+    page_size_query_param='page_size'
 
 @api_view(http_method_names=['GET','POST'])
 @permission_classes([AllowAny])
@@ -74,6 +81,7 @@ def homepage(request:Request):
 class PostListCreateView(GenericAPIView,mixins.ListModelMixin,mixins.CreateModelMixin):
     serializer_class=PostSerializer
     permission_classes=[IsAuthenticated]
+    pagination_class=CustomPaginator
     queryset=Post.objects.all()
     def perform_create(self, serializer):
         user=self.request.user
