@@ -6,6 +6,7 @@ from rest_framework.decorators import api_view,APIView,permission_classes
 from rest_framework.generics import GenericAPIView
 from .models import Post
 from .serializers import PostSerializer
+from .permissions import ReadOnly,AuthorOrReadonly
 from django.shortcuts import get_object_or_404
 #when dealing with viewsets
 from rest_framework import viewsets
@@ -51,7 +52,7 @@ class PostListCreateView(APIView):
     """
     #it allow us to convert our object to json as well as be able to create post request with some validations
     serializer_class=PostSerializer
-    permission_classes=[IsAdminUser]
+    permission_classes=[IsAuthenticatedOrReadOnly]
     def get(self,request:Request,*args,**kwargs):
         posts=Post.objects.all()
         #creating an instance of our serializer that going to help us serilize the posts
@@ -144,15 +145,16 @@ class PostListCreateView(APIView):
 #         post.delete()
 #         return Response(status=status.HTTP_204_NO_CONTENT)
 
-# class PostRetrieveUpdateDeleteView(GenericAPIView,mixins.RetrieveModelMixin,mixins.UpdateModelMixin,mixins.DestroyModelMixin):
-#     serializer_class=PostSerializer
-#     queryset=Post.objects.all()
-#     def get(self,request:Request,*args,**kwargs):
-#         return self.retrieve(request,*args,**kwargs)
-#     def put(self,request:Request,*args,**kwargs):
-#         return self.update(request,*args,**kwargs)
-#     def delete(self,request:Request,*args,**kwargs):
-#         return self.destroy(request,*args,**kwargs)
+class PostRetrieveUpdateDeleteView(GenericAPIView,mixins.RetrieveModelMixin,mixins.UpdateModelMixin,mixins.DestroyModelMixin):
+    serializer_class=PostSerializer
+    queryset=Post.objects.all()
+    permission_classes=[AuthorOrReadonly]
+    def get(self,request:Request,*args,**kwargs):
+        return self.retrieve(request,*args,**kwargs)
+    def put(self,request:Request,*args,**kwargs):
+        return self.update(request,*args,**kwargs)
+    def delete(self,request:Request,*args,**kwargs):
+        return self.destroy(request,*args,**kwargs)
 
 # class PostViewset(viewsets.ViewSet):
 #     def list(self,request:Request):
