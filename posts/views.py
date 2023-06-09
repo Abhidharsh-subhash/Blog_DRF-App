@@ -80,7 +80,9 @@ def homepage(request:Request):
 #Creating views using GenericAPIView with mixins
 class PostListCreateView(GenericAPIView,mixins.ListModelMixin,mixins.CreateModelMixin):
     serializer_class=PostSerializer
-    permission_classes=[IsAuthenticated]
+    #while testing this code in test.py file then you need to change the permission to allowany
+    permission_classes=[AllowAny]
+    # permission_classes=[IsAuthenticated]
     pagination_class=CustomPaginator
     queryset=Post.objects.all()
     def perform_create(self, serializer):
