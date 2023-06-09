@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     'rest_framework',
     #for token generation
     'rest_framework.authtoken',
+    'drf_yasg',
 ]
 
 AUTH_USER_MODEL = 'accounts.User'
@@ -64,14 +65,26 @@ REST_FRAMEWORK = {
     #it is used becaue when we test the api's we are getting an error and shows that as "non-field-errors"
     "NON_FIELD_ERRORS_KEY":"errors",
     "DEFAULT_AUTHENTICATION_CLASSES":(
-        "rest_framework.authentication.SessionAuthentication",
-        "rest_framework.authentication.TokenAuthentication",
+        #we are avoiding this because we use only jwt authentication
+        # "rest_framework.authentication.SessionAuthentication",
+        # "rest_framework.authentication.TokenAuthentication",
         #used when start using simpeljwt 
         'rest_framework_simplejwt.authentication.JWTAuthentication',
     ),
-    "DEFAULT_PERMISSION_CLASSES":("rest_framework.permissions.IsAuthenticated",),
+    # "DEFAULT_PERMISSION_CLASSES":("rest_framework.permissions.IsAuthenticated",),
     "DEFAULT_PAGINATION_CLASS":"rest_framework.pagination.PageNumberPagination",
     "PAGE_SIZE":3
+}
+
+#to implement authentication inside the Swagger documentation
+SWAGGER_SETTINGS = {
+   'SECURITY_DEFINITIONS': {
+      'Bearer': {
+            'type': 'apiKey',
+            'name': 'Authorization',
+            'in': 'header'
+      }
+   }
 }
 
 #this we will use only for configuring the jwt token

@@ -11,6 +11,7 @@ from rest_framework.pagination import PageNumberPagination
 from django.shortcuts import get_object_or_404
 #when dealing with viewsets
 from rest_framework import viewsets
+from drf_yasg.utils import swagger_auto_schema
 
 #custom class for defining the pagination class
 class CustomPaginator(PageNumberPagination):
@@ -89,6 +90,10 @@ class PostListCreateView(GenericAPIView,mixins.ListModelMixin,mixins.CreateModel
         user=self.request.user
         serializer.save(author=user)
         return super().perform_create(serializer)
+    @swagger_auto_schema(
+            operation_summary='lists of all posts available',
+            operation_description='This returns list of all posts'
+    )
     def get(self,request:Request,*args,**kwargs):
         return self.list(request,*args,**kwargs)
     def post(self,request:Request,*args,**kwargs):
