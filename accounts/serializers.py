@@ -10,6 +10,7 @@ class SignUpSerializer(serializers.ModelSerializer):
     password=serializers.CharField(min_length=8,write_only=True)
     class Meta:
         model=User
+        # fields = '__all__'  # if you need to specify all the fields in the model
         fields=['email','username','password']
     def validate(self, attrs):
         email_exists=User.objects.filter(email=attrs['email']).exists()
