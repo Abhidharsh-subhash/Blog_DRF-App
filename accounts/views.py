@@ -8,6 +8,7 @@ from rest_framework.response import Response
 from rest_framework.request import Request
 from rest_framework.views import APIView
 from .tokens import create_jwt_paie_for_user
+from rest_framework_simplejwt.tokens import RefreshToken
 # Create your views here.
 
 class SignUpView(GenericAPIView):
@@ -30,10 +31,16 @@ class LoginView(APIView):
         password=request.data.get('password')
         user=authenticate(email=email,password=password)
         if user is not None:
-            tokens=create_jwt_paie_for_user(user)
+            #generating the custom token and access token
+            # tokens=create_jwt_paie_for_user(user)
+            #django's default one
+            tokens = RefreshToken.for_user(user)
             response={
                 'message':'Login successfull',
-                'token':tokens
+                #when custom token uses
+                #'token':tokens
+                'access':str(tokens.access_token),
+                'refresh':str(tokens)
             }
             return Response(data=response,status=status.HTTP_200_OK)
         else:

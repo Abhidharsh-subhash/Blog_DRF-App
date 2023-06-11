@@ -10,4 +10,5 @@ def create_jwt_paie_for_user(user:User):
         'access':str(refresh.access_token),
         'refresh':str(refresh)
     }
+    print(tokens)
     return tokens
